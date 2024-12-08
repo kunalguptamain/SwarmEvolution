@@ -1,5 +1,5 @@
 import numpy as np
-import "robot.py"
+import robot
 import random
 
 TOTAL_NUM_INPUT = 10
@@ -19,11 +19,11 @@ class World:
         for i in range(len(self.robot_array)):
             position = grid_positions.pop(random.randrange(1, len(grid_positions)))
             self.grid[position[0]][position[1]] = i
-            self.robot_array[i] = Robot()
+            self.robot_array[i] = robot.Robot()
         return
 
     def tick(self):
         self.prev_grid = self.grid
         self.grid = np.zeros(shape=(self.size, self.size))
         for robot in self.robot_array:
-
+            

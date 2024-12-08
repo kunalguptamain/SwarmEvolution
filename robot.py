@@ -66,6 +66,3 @@ class Robot:
         internal_state = self.internal_weights.T @ sensor_input_vector
         output_state = internal_state.T @ self.output_weights
         return np.argmax(output_state)
-    
-robot = Robot(10, 5, 5, 2, 0, 0)
-robot.mutate_weights(0.5, 0.2)
