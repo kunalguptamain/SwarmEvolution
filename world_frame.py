@@ -19,11 +19,11 @@ class World:
         for i in range(len(self.robot_array)):
             position = grid_positions.pop(random.randrange(1, len(grid_positions)))
             self.grid[position[0]][position[1]] = i
-            self.robot_array[i] = robot.Robot()
+            self.robot_array[i] = robot.Robot(TOTAL_NUM_INPUT, TOTAL_NUM_OUTPUT, RESTRICTED_NUM_INPUT, NUM_NEURONS, position[0], position[1])
         return
 
     def tick(self):
         self.prev_grid = self.grid
         self.grid = np.zeros(shape=(self.size, self.size))
         for robot in self.robot_array:
-            
+            robot.movment_choice()
