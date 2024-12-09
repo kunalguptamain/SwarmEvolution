@@ -17,7 +17,9 @@ class Robot:
         self.position = position
 
         self.genome = np.random.randint(0, self.total_global_sensor_count, size=self.number_of_sensors)
+        self.mask = np.random.randint(0, 7, size=(self.number_of_sensors, self.number_of_neurons)) != 3
         self.internal_weights = np.random.uniform(-1, 1, size=(self.number_of_sensors, self.number_of_neurons))
+        self.internal_weights[self.mask] = 0
         self.output_weights = np.random.uniform(-1, 1, size=(self.number_of_neurons, self.total_global_output_count))
 
     @classmethod
@@ -31,6 +33,7 @@ class Robot:
         genome: np.ndarray,
         internal_weights: np.ndarray,
         output_weights: np.ndarray,
+        mask: np.ndarray,
     ):
         # Create an instance without random initialization
         instance = cls(
@@ -44,8 +47,12 @@ class Robot:
         instance.genome = genome
         instance.internal_weights = internal_weights
         instance.output_weights = output_weights
+        instance.mask = mask
 
         return instance
+    
+    def get_mask(self):
+        return self.mask
     
     def get_internal_weights(self):
         return self.internal_weights
@@ -83,6 +90,7 @@ class Robot:
         self.output_weights[outer_mutated] += np.random.uniform(-change_range, change_range, size=np.sum(outer_mutated))
 
         self.internal_weights = np.clip(self.internal_weights, -1, 1)
+        self.internal_weights[self.mask] = 0
 
         #normalization of output weights to prevent domincance
         row_norms = np.linalg.norm(self.output_weights, axis=1, keepdims=True)

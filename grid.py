@@ -1,58 +1,45 @@
 class Grid:
-
-    def __init__(
-        self,
-        grid,
-        visibility_radius: int = 5,
-    ):
+    def __init__(self, grid, prev_prefix_sum, grid_size, visibility_radius=3):
         self.grid = grid
-        self.prefix_sum.compute_prefix_sum() #use prefix sum function
+        self.grid_size = grid_size
+        self.prefix_sum = self.compute_prefix_sum(grid)
+        self.prefix_sum_difference = self.prefix_sum - prev_prefix_sum
         self.visibility_radius = visibility_radius
 
-    def get_num_robots_forward(position: tuple):
-        return None
-
     def compute_prefix_sum(self, grid):
-        rows, cols = self.grid.shape
-        prefix_sum = np.zeros_like(grid, dtype=int)
-        for i in range(rows):
-            for j in range(cols):
-                prefix_sum[i][j] = (
-                    grid[i][j]
-                    + (prefix_sum[i-1][j] if i > 0 else 0)
-                    + (prefix_sum[i][j-1] if j > 0 else 0)
-                    - (prefix_sum[i-1][j-1] if i > 0 and j > 0 else 0)
-                )
-        return prefix_sum
+        return grid.cumsum(axis=0).cumsum(axis=1)
 
-    def compute_subarray(self, tuple1, tuple2):
+    def compute_area_sum(self, prefix_array, tuple1, tuple2):
         x1, y1 = tuple1
         x2, y2 = tuple2
-
-        if (x1 - 1) < 0 and (y1-1) < 0:
-            return self.prefix_sum[x2, y2]
-        elif (x1 - 1) < 0:
-            return self.prefix_sum[x2, y2] - self.prefix_sum[x2, y1 - 1]
-        elif (y1 - 1) < 0:
-            return self.prefix_sum[x2, y2] - self.prefix_sum[x1 - 1, y2]
-        else:
-            return self.prefix_sum[x2][y2] +
-                    self.prefix_sum[x1-1] - 
-                    self.prefix_sum[x1 - 1, y2] -
-                    self.prefix_sum[x2, y1 - 1]
+        total = prefix_array[x2, y2]
+        if x1 > 0:
+            total -= prefix_array[x1 - 1, y2]
+        if y1 > 0:
+            total -= prefix_array[x2, y1 - 1]
+        if x1 > 0 and y1 > 0:
+            total += prefix_array[x1 - 1, y1 - 1]
+        return total
 
     def sense_peripheral_robots(self, position):
-        data_vector = [0, 0, 0, 0]
         x_pos, y_pos = position
-        
-        data_vector[0] = compute_subarray((argmin(x_pos + 3, self.grid_size), argmax(y_pos - 2, 0)),
-                                          (argmin(x_pos + 1, self.grid_size), argmin(y_pos + 2, self.grid_size)))
-        data_vector[1] = compute_subarray((argmax(x_pos - 1, 0), argmax(y_pos - 2, 0)),
-                                          (argmax(x_pos - 3, 0), argmin(y_pos + 2, self.grid_size)))
-        data_vector[2] = compute_subarray((argmin(x_pos + 2, self.grid_size), argmin(y_pos + 1, self.grid_size)),
-                                          (argmax(x_pos - 2, 0), argmin(y_pos + 3, self.grid_size)))
-        data_vector[3] = compute_subarray((argmin(x_pos + 2, self.grid_size), argmax(y_pos - 3, 0)),
-                                          (argmax(x_pos - 3, 0), argmax(y_pos - 1, 0)))
+        grid_size = self.grid_size - 1
+        offset1 = self.visibility_radius
+        offset2 = self.visibility_radius - 1
 
-        return data_vector
+        quadrants = [
+            ((min(x_pos + offset1, grid_size), max(y_pos - offset2, 0)),
+             (min(x_pos + 1, grid_size), min(y_pos + offset2, grid_size))),
+            ((max(x_pos - 1, 0), max(y_pos - offset2, 0)),
+             (max(x_pos - offset1, 0), min(y_pos + offset2, grid_size))),
+            ((min(x_pos + offset2, grid_size), min(y_pos + 1, grid_size)),
+             (max(x_pos - offset2, 0), min(y_pos + offset1, grid_size))),
+            ((min(x_pos + offset2, grid_size), max(y_pos - offset1, 0)),
+             (max(x_pos - offset1, 0), max(y_pos - 1, 0))),
+        ]
 
+        return [
+            self.compute_area_sum(self.prefix_sum, *q) for q in quadrants
+        ] + [
+            self.compute_area_sum(self.prefix_sum_difference, *q) for q in quadrants
+        ]
