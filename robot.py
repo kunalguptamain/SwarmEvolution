@@ -25,15 +25,13 @@ class Robot:
         cls,
         total_global_sensor_count: int,
         total_global_output_count: int,
+        number_of_sensors: int, # how many sensors is the robot restricted to 
+        number_of_neurons: int, # how many neurons is the robot restricted to
         position: tuple,
         genome: np.ndarray,
         internal_weights: np.ndarray,
         output_weights: np.ndarray,
     ):
-        # Infer number_of_sensors and number_of_neurons from provided weights
-        number_of_sensors = genome.shape[0]
-        number_of_neurons = internal_weights.shape[1]
-
         # Create an instance without random initialization
         instance = cls(
             total_global_sensor_count,
