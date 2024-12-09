@@ -20,6 +20,41 @@ class Robot:
         self.internal_weights = np.random.uniform(-1, 1, size=(self.number_of_sensors, self.number_of_neurons))
         self.output_weights = np.random.uniform(-1, 1, size=(self.number_of_neurons, self.total_global_output_count))
 
+    @classmethod
+    def clone(
+        cls,
+        total_global_sensor_count: int,
+        total_global_output_count: int,
+        position: tuple,
+        genome: np.ndarray,
+        internal_weights: np.ndarray,
+        output_weights: np.ndarray,
+    ):
+        # Infer number_of_sensors and number_of_neurons from provided weights
+        number_of_sensors = genome.shape[0]
+        number_of_neurons = internal_weights.shape[1]
+
+        # Create an instance without random initialization
+        instance = cls(
+            total_global_sensor_count,
+            total_global_output_count,
+            number_of_sensors,
+            number_of_neurons,
+            position,
+        )
+        # Manually set the genome and weights
+        instance.genome = genome
+        instance.internal_weights = internal_weights
+        instance.output_weights = output_weights
+
+        return instance
+    
+    def get_internal_weights(self):
+        return self.internal_weights
+    
+    def get_output_weights(self):
+        return self.output_weights
+
     def set_position(self, position):
         self.position = position
 
