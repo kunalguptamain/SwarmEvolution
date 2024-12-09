@@ -1,6 +1,6 @@
 class Grid:
-    def __init__(self, grid, prev_prefix_sum, grid_size, visibility_radius=3):
-        self.grid = grid
+    def __init__(self, grid, prev_prefix_sum, grid_size, visibility_radius=6):
+        self.grid = [i > 0 for i in grid]
         self.grid_size = grid_size
         self.prefix_sum = self.compute_prefix_sum(grid)
         self.prefix_sum_difference = self.prefix_sum - prev_prefix_sum

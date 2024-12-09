@@ -3,11 +3,12 @@ from robot import Robot
 import random
 from typing import List
 from grid import Grid
+import math
 
-TOTAL_NUM_INPUT = 10
+TOTAL_NUM_INPUT = 12
 TOTAL_NUM_OUTPUT = 5
 RESTRICTED_NUM_INPUT = 9
-NUM_NEURONS = 12
+NUM_NEURONS = 7
 
 class World:
     def __init__(self, grid_size, num_robots, goal_radius = 12):
@@ -26,6 +27,7 @@ class World:
         grid_positions = [(x, y) for x in range(self.grid_size) for y in range(self.grid_size)]
         for i in range(1, len(self.robot_array)):
             position = grid_positions.pop(random.randrange(1, len(grid_positions)))
+            position = ((self.grid_size // 2) + random.randrange(-5, 5), (self.grid_size // 2) + random.randrange(-5, 5))
             self.grid[position[0]][position[1]] = i
             self.robot_array[i] = Robot(TOTAL_NUM_INPUT, TOTAL_NUM_OUTPUT, RESTRICTED_NUM_INPUT, NUM_NEURONS, position)
         return self.grid
@@ -54,22 +56,25 @@ class World:
             robot: Robot = self.robot_array[id]
 
             sensor_vector = sensor_grid.sense_peripheral_robots(robot.get_position())
+            # sensor_vector = []
 
             sensor_vector.append(1 if robot.position[0] > (self.goal_center[0] + self.goal_radius) or \
                                 robot.position[0] < (self.goal_center[0] - self.goal_radius) or \
                                 robot.position[1] > (self.goal_center[1] + self.goal_radius) or  \
                                 robot.position[1] < (self.goal_center[1] - self.goal_radius) else 0)
 
+            # sensor_vector.append(math.copysign(1, self.goal_center[0] - robot.position[0]))
+            # sensor_vector.append(math.copysign(1, self.goal_center[1] - robot.position[1]))
+            #sensor_vector.append(random.randrange(-2, 2))
+
             new_position = self.get_new_position(robot.movment_choice(sensor_vector), robot.get_position()) #TODO: insert movement choice
 
-            # if self.grid[new_position[0], new_position[1]] != 0:
-            #     #self.robot_array[id] = None
-            #     self.robot_array[self.grid[new_position[0], new_position[1]]] = None
-            #     self.grid[new_position[0], new_position[1]] = 0
-            #      # TODO: Change if we only want one to die
+            if self.grid[new_position[0], new_position[1]] == 0:
+                self.grid[new_position[0], new_position[1]] = id
+                robot.set_position(new_position)
+            else:
+                self.grid[robot.position[0], robot.position[1]] = id
 
-            self.grid[new_position[0], new_position[1]] = id
-            robot.set_position(new_position)
         self.prev_prefix_grid = sensor_grid.prefix_sum
 
         return self.goal_center, self.goal_radius, self.grid
@@ -114,12 +119,14 @@ class World:
         #mutate
         for peng in self.robot_array:
             peng.mutate_genome(0.01) #TODO: global mutation
-            peng.mutate_weights(0.5, 0.02) 
+            peng.mutate_weights(0.5, 0.1) 
 
         #assign new positions
         grid_positions = [(x, y) for x in range(self.grid_size) for y in range(self.grid_size)]
         for i in range(1, len(self.robot_array)):
             position = grid_positions.pop(random.randrange(1, len(grid_positions)))
+            # position = (self.grid_size // 2, self.grid_size // 2)
+            position = ((self.grid_size // 2) + random.randrange(-5, 5), (self.grid_size // 2) + random.randrange(-5, 5))
             self.grid[position[0]][position[1]] = i
             self.robot_array[i].position = (position)
     

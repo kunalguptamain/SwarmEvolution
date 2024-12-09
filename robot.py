@@ -17,10 +17,12 @@ class Robot:
         self.position = position
 
         self.genome = np.random.randint(0, self.total_global_sensor_count, size=self.number_of_sensors)
-        self.mask = np.random.randint(0, 7, size=(self.number_of_sensors, self.number_of_neurons)) != 3
+        self.mask = np.random.randint(0, 4, size=(self.number_of_sensors, self.number_of_neurons)) != 3
+        self.mask2 = np.random.randint(0, 3, size=(self.number_of_neurons, self.total_global_output_count)) != 2
         self.internal_weights = np.random.uniform(-1, 1, size=(self.number_of_sensors, self.number_of_neurons))
         self.internal_weights[self.mask] = 0
         self.output_weights = np.random.uniform(-1, 1, size=(self.number_of_neurons, self.total_global_output_count))
+        self.output_weights[self.mask2] = 0
 
     @classmethod
     def clone(
@@ -98,6 +100,7 @@ class Robot:
         self.output_weights /= row_norms
 
         self.output_weights = np.clip(self.output_weights, -1, 1)
+        self.output_weights[self.mask2] = 0
 
     def movment_choice(
         self,

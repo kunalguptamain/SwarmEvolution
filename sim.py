@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 world = World(
-    35,
-    200,
-    goal_radius=4
+    50,
+    100,
+    goal_radius=5
 )
 
-num_ticks = 80
-num_epochs = 401
+num_ticks = 140
+num_epochs = 1001
 
 grid = world.spawn_swarm()
 
@@ -19,9 +19,10 @@ for epoch in range(num_epochs):
     for tick in range(num_ticks):
         center, radius, grid = world.tick()
         if epoch == 0 and tick == 0: print(center)
-        grid_history.append(grid > 0)
+        if epoch in [0, 80, 160, 400, 800, 1000]:
+            grid_history.append(grid > 0)
 
-    if epoch in [1, 80, 160, 400]:
+    if epoch in [0, 80, 160, 400, 800, 1000]:
         fig, ax = plt.subplots()
         cax = ax.matshow(grid_history[0], cmap="gray")
         plt.colorbar(cax)
