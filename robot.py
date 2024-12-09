@@ -8,21 +8,20 @@ class Robot:
         total_global_output_count: int, # how many ouputs can a robot do (forward, backwards, etc.)
         number_of_sensors: int, # how many sensors is the robot restricted to 
         number_of_neurons: int, # how many neurons is the robot restricted to
-        x: int,
-        y: int,
+        position: tuple,
     ):
         self.number_of_sensors = number_of_sensors
         self.number_of_neurons = number_of_neurons
         self.total_global_sensor_count= total_global_sensor_count
         self.total_global_output_count = total_global_output_count
-        self.position = (x, y)
+        self.position = position
 
         self.genome = np.random.randint(0, self.total_global_sensor_count, size=self.number_of_sensors)
         self.internal_weights = np.random.uniform(-1, 1, size=(self.number_of_sensors, self.number_of_neurons))
         self.output_weights = np.random.uniform(-1, 1, size=(self.number_of_neurons, self.total_global_output_count))
 
-    def set_position(self, x, y):
-        self.position = (x, y)
+    def set_position(self, position):
+        self.position = position
 
     def get_position(self):
         return self.position

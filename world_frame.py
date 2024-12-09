@@ -26,4 +26,4 @@ class World:
         self.prev_grid = self.grid
         self.grid = np.zeros(shape=(self.size, self.size))
         for robot in self.robot_array:
-            
+            pass
